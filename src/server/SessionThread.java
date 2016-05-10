@@ -57,6 +57,79 @@ public class SessionThread extends Thread {
 		}		
 	}
 	
+	private void sendToClient(Message m){
+		try {
+			output.writeObject(m);
+			output.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	/* YOUR IMPLEMENTATION */
+	public void run(){
+		while(running){
+			try {
+				Message m = (Message)input.readObject();
+				
+				switch(m.getType()){
+				case QUIT:
+					disconnect();
+					this.running = false;
+					break;
+				case LOGIN:
+					MessageLOGIN ml= (MessageLOGIN)m;
+					if(database.existsChatUser(ml.getUser())){
+						this.username = ml.getUser().getUsername();
+						MessageCHATLIST mu = new MessageCHATLIST(database.selectChatHistory(ml.getUser()));
+						sendToClient(mu);
+					}else{
+						MessageERROR_LOGIN mel = new MessageERROR_LOGIN("Der Benutzer ist nicht registriert!");
+						sendToClient(mel);
+					}
+					break;
+				case REGISTER:
+					MessageREGISTER mr= (MessageREGISTER)m;
+					if(database.insertChatUser(mr.getUser())){
+						this.username = mr.getUser().getUsername();
+						MessageCHATLIST mu = new MessageCHATLIST(database.selectChatHistory(mr.getUser()));
+						sendToClient(mu);
 
+					}else{
+						MessageERROR_REGISTER mer = new MessageERROR_REGISTER("Der Benutzername ist bereits vergeben!");
+						sendToClient(mer);
+					}
+					break;
+				case UPDATE:
+					if(this.username.equals("")){
+						sendToClient(new MessageCHATLIST_UPDATE(new ArrayList<ChatHistory>()));
+					}else{
+						ChatUser cu = new ChatUser(username);
+						sendToClient(new MessageCHATLIST_UPDATE(database.selectUnreadChatHistory(cu)));
+						database.updateUnreadChatMessages(cu);
+					}
+					break;
+				case USERS:
+						sendToClient(new MessageUSERLIST(database.selectChatUsers()));
+					break;
+				case SEND:
+					ChatUser cu = new ChatUser(username);
+					sendToClient(new MessageCHATLIST_UPDATE(database.selectUnreadChatHistory(cu)));
+					database.updateUnreadChatMessages(cu);
+					break;
+				case LOGOUT:
+					username = "";
+					sendToClient(new MessageCHATLIST(new ArrayList<ChatHistory>()));
+					break;
+				default:
+					break;
+				
+				}
+				
+				
+			} catch (ClassNotFoundException | IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 }
