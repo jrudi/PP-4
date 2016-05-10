@@ -1,0 +1,41 @@
+package messages;
+
+public enum MessageType {
+
+	// CLIENT -> SERVER
+	QUIT, 
+	
+	// CLIENT -> SERVER
+	LOGIN, 
+	
+	// CLIENT -> SERVER
+	REGISTER, 
+	
+	// CLIENT -> SERVER
+	UPDATE,
+	
+	// CLIENT -> SERVER
+	USERS,
+	
+	// CLIENT -> SERVER
+	SEND,
+	
+	// CLIENT -> SERVER
+	LOGOUT, 
+	
+	// SERVER -> CLIENT
+	ERROR_LOGIN,
+		
+	// SERVER -> CLIENT
+	ERROR_REGISTER,
+	
+	// SERVER -> CLIENT
+	USERLIST,
+	
+	// SERVER -> CLIENT
+	CHATLIST,
+	
+	// SERVER -> CLIENT
+	CHATLIST_UPDATE;
+	
+}
