@@ -20,7 +20,7 @@ public class Client {
     private UI ui;
     
     /** thread which is permanently requesting for new data at the server */
-//    private PullThread thread;
+    private PullThread thread;
     
     /** user that is currently logged in for this client ("" means that currently no user is logged in for this client) */
     private String username;
@@ -56,8 +56,8 @@ public class Client {
 			e.printStackTrace();
 		}
 		
-//		this.thread = new PullThread(this);
-//		this.thread.start();
+		this.thread = new PullThread(this);
+		this.thread.start();
 	}
 	
 	public void addChatHistoryNew(int index, ChatHistory history) {
@@ -70,7 +70,7 @@ public class Client {
 	 * closes all connections with the server and terminates the pull thread
 	 */
 	public void disconnect() {
-//		this.thread.end();
+		this.thread.end();
 		
 		try {
 			this.input.close();
@@ -80,6 +80,16 @@ public class Client {
 			e.printStackTrace();
 		}
 	}
+	
+	public void send(Message m){
+		try {
+			output.writeObject(m);
+			output.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	
 	/**
 	 * sets the name of the user that is currently logged in for this client to the specified parameter
@@ -150,7 +160,32 @@ public class Client {
 		}
 	}
 	
-	/* YOUR IMPLEMENTATION */
+	public Message receive(){
+		try {
+			return(Message)input.readObject();
+			
+		}catch(IOException | ClassNotFoundException ie){
+			ie.printStackTrace();
+			return null;
+		}
+	}
+	
+	public void handleUPDATE(MessageCHATLIST_UPDATE mcu){
+		if (mcu.getChats().size()>0){
+			addChatHistoryUnread(mcu.getChats());
+			ui.updateUI();
+			ui.playUPDATE();
+		}	
+	}
+	
+	public void sendChatMessage(int index, String message){
+		ChatUser self = new ChatUser(username);
+		ChatUser other = this.getData().get(index).getOther();
+		ChatMessage cm = new ChatMessage(self, other, message, System.currentTimeMillis());
+		addChatMessageSend(index, cm);
+		send(new MessageSEND(cm));
+	}
+	
 
 	public static void main(String[] args) {
 		Client client = new Client();
