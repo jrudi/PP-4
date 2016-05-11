@@ -66,7 +66,6 @@ public class SessionThread extends Thread {
 		}
 	}
 	
-	/* YOUR IMPLEMENTATION */
 	public void run(){
 		while(running){
 			try {
@@ -81,6 +80,7 @@ public class SessionThread extends Thread {
 					MessageLOGIN ml= (MessageLOGIN)m;
 					if(database.existsChatUser(ml.getUser())){
 						this.username = ml.getUser().getUsername();
+						database.updateUnreadChatMessages(ml.getUser());
 						MessageCHATLIST mu = new MessageCHATLIST(database.selectChatHistory(ml.getUser()));
 						sendToClient(mu);
 					}else{
@@ -113,6 +113,8 @@ public class SessionThread extends Thread {
 						sendToClient(new MessageUSERLIST(database.selectChatUsers()));
 					break;
 				case SEND:
+					MessageSEND cm = (MessageSEND)m;
+					database.insertChatMessage(cm.getMessage());
 					ChatUser cu = new ChatUser(username);
 					sendToClient(new MessageCHATLIST_UPDATE(database.selectUnreadChatHistory(cu)));
 					database.updateUnreadChatMessages(cu);

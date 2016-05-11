@@ -659,8 +659,8 @@ public class UI extends JFrame {
 				}
 				break;
 			case "SENDEN":
+				//playSEND();
 				client.sendChatMessage(index, textfield.getText());
-				playSEND();
 				textfield.setText("");
 				MessageCHATLIST_UPDATE cm = (MessageCHATLIST_UPDATE) client.receive();
 				client.handleUPDATE(cm);		

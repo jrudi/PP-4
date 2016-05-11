@@ -80,17 +80,7 @@ public class Client {
 			e.printStackTrace();
 		}
 	}
-	
-	public void send(Message m){
-		try {
-			output.writeObject(m);
-			output.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	
+		
 	/**
 	 * sets the name of the user that is currently logged in for this client to the specified parameter
 	 * 
@@ -160,9 +150,21 @@ public class Client {
 		}
 	}
 	
+	public void send(Message m){
+		try {
+			System.out.println("S: " + m.getClass().getName());
+			output.writeObject(m);
+			output.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public Message receive(){
 		try {
-			return(Message)input.readObject();
+			Message m = (Message)input.readObject();
+			System.out.println("R: " + m.getClass().getName());
+			return m;
 			
 		}catch(IOException | ClassNotFoundException ie){
 			ie.printStackTrace();
@@ -184,6 +186,7 @@ public class Client {
 		ChatMessage cm = new ChatMessage(self, other, message, System.currentTimeMillis());
 		addChatMessageSend(index, cm);
 		send(new MessageSEND(cm));
+		ui.updateUI();
 	}
 	
 
