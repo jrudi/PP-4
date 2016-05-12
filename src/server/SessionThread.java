@@ -57,7 +57,7 @@ public class SessionThread extends Thread {
 		}		
 	}
 	
-	private void sendToClient(Message m){
+	private void send(Message m){
 		try {
 			output.writeObject(m);
 			output.flush();
@@ -82,10 +82,10 @@ public class SessionThread extends Thread {
 						this.username = ml.getUser().getUsername();
 						database.updateUnreadChatMessages(ml.getUser());
 						MessageCHATLIST mu = new MessageCHATLIST(database.selectChatHistory(ml.getUser()));
-						sendToClient(mu);
+						send(mu);
 					}else{
 						MessageERROR_LOGIN mel = new MessageERROR_LOGIN("Der Benutzer ist nicht registriert!");
-						sendToClient(mel);
+						send(mel);
 					}
 					break;
 				case REGISTER:
@@ -93,35 +93,35 @@ public class SessionThread extends Thread {
 					if(database.insertChatUser(mr.getUser())){
 						this.username = mr.getUser().getUsername();
 						MessageCHATLIST mu = new MessageCHATLIST(database.selectChatHistory(mr.getUser()));
-						sendToClient(mu);
+						send(mu);
 
 					}else{
 						MessageERROR_REGISTER mer = new MessageERROR_REGISTER("Der Benutzername ist bereits vergeben!");
-						sendToClient(mer);
+						send(mer);
 					}
 					break;
 				case UPDATE:
 					if(this.username.equals("")){
-						sendToClient(new MessageCHATLIST_UPDATE(new ArrayList<ChatHistory>()));
+						send(new MessageCHATLIST_UPDATE(new ArrayList<ChatHistory>()));
 					}else{
 						ChatUser cu = new ChatUser(username);
-						sendToClient(new MessageCHATLIST_UPDATE(database.selectUnreadChatHistory(cu)));
+						send(new MessageCHATLIST_UPDATE(database.selectUnreadChatHistory(cu)));
 						database.updateUnreadChatMessages(cu);
 					}
 					break;
 				case USERS:
-						sendToClient(new MessageUSERLIST(database.selectChatUsers()));
+						send(new MessageUSERLIST(database.selectChatUsers()));
 					break;
 				case SEND:
 					MessageSEND cm = (MessageSEND)m;
 					database.insertChatMessage(cm.getMessage());
 					ChatUser cu = new ChatUser(username);
-					sendToClient(new MessageCHATLIST_UPDATE(database.selectUnreadChatHistory(cu)));
+					send(new MessageCHATLIST_UPDATE(database.selectUnreadChatHistory(cu)));
 					database.updateUnreadChatMessages(cu);
 					break;
 				case LOGOUT:
 					username = "";
-					sendToClient(new MessageCHATLIST(new ArrayList<ChatHistory>()));
+					send(new MessageCHATLIST(new ArrayList<ChatHistory>()));
 					break;
 				default:
 					break;

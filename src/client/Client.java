@@ -152,7 +152,6 @@ public class Client {
 	
 	public void send(Message m){
 		try {
-			System.out.println("S: " + m.getClass().getName());
 			output.writeObject(m);
 			output.flush();
 		} catch (IOException e) {
@@ -163,7 +162,6 @@ public class Client {
 	public Message receive(){
 		try {
 			Message m = (Message)input.readObject();
-			System.out.println("R: " + m.getClass().getName());
 			return m;
 			
 		}catch(IOException | ClassNotFoundException ie){

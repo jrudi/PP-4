@@ -20,7 +20,7 @@ public class PullThread extends Thread{
 			client.send(new MessageUPDATE());
 			MessageCHATLIST_UPDATE mcu = (MessageCHATLIST_UPDATE)client.receive();
 			client.handleUPDATE(mcu);
-			Thread.sleep(5000);
+			Thread.sleep(1000);
 			
 		} catch (InterruptedException e) {
 			e.printStackTrace();
